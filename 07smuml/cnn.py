@@ -168,20 +168,20 @@ print(X_test.shape)
 y_train_ohe = keras.utils.to_categorical(y_train, NUM_CLASSES)
 y_test_ohe = keras.utils.to_categorical(y_test, NUM_CLASSES)
 
-# make a 3 layer keras MLP\
-mlp = Sequential()
-mlp.add( Dense(input_dim=X_train.shape[1], units=30, activation='relu') )
-mlp.add( Dense(units=15, activation='relu') )
-mlp.add( Dense(NUM_CLASSES) )
-mlp.add( Activation('softmax') )
+# # make a 3 layer keras MLP\
+# mlp = Sequential()
+# mlp.add( Dense(input_dim=X_train.shape[1], units=30, activation='relu') )
+# mlp.add( Dense(units=15, activation='relu') )
+# mlp.add( Dense(NUM_CLASSES) )
+# mlp.add( Activation('softmax') )
 
-mlp.compile(loss='mean_squared_error', 
-            optimizer='rmsprop',
-            metrics=['accuracy'])
+# mlp.compile(loss='mean_squared_error', 
+#             optimizer='rmsprop',
+#             metrics=['accuracy'])
                             
-mlp.fit(X_train, y_train_ohe,
-        batch_size=32, epochs=100,
-        shuffle=True, verbose=1)
+# mlp.fit(X_train, y_train_ohe,
+#         batch_size=32, epochs=100,
+#         shuffle=True, verbose=1)
 
 
 # In[ ]:
@@ -190,33 +190,37 @@ mlp.fit(X_train, y_train_ohe,
 cnn_layers = [16, 16]
 
 # make a CNN with conv layer and max pooling
-
 cnn = Sequential()
 cnn.add(Reshape((1,h,w), input_shape=(1,h*w)))
 
 for n in cnn_layers:
-    cnn.add(Conv2D(filters=n, kernel_size= (3, 3), padding='same', input_shape=(1,h,w)))
+    cnn.add(Conv2D(filters=n, kernel_size= (3, 3), padding='same'))
     cnn.add(Activation('relu'))
     cnn.add(MaxPooling2D(pool_size=(2, 2), data_format="channels_first"))
     
-    # add one layer on flattened output
-    cnn.add(Flatten())
-    cnn.add(Dense(50))
-    cnn.add(Activation('relu'))
-    cnn.add(Dense(NUM_CLASSES))
-    cnn.add(Activation('softmax'))
-    
-    # Let's train the model 
-    cnn.compile(loss='mean_squared_error',
-                optimizer='rmsprop',
-                metrics=['accuracy'])
-    
-    # we need to exapnd the dimensions here to give the
-    #   "channels" dimension expected by Keras
-    cnn.fit(np.expand_dims(X_train, axis=1), y_train_ohe,
-            batch_size=32, epochs=100,
-            shuffle=True, verbose=1)
+# add one layer on flattened output
+cnn.add(Flatten())
+cnn.add(Dense(50))
+cnn.add(Activation('relu'))
+cnn.add(Dense(NUM_CLASSES))
+cnn.add(Activation('softmax'))
 
+import time
+
+t = time.time()
+
+# Let's train the model 
+cnn.compile(loss='mean_squared_error',
+            optimizer='rmsprop',
+            metrics=['accuracy'])
+
+# we need to exapnd the dimensions here to give the
+#   "channels" dimension expected by Keras
+cnn.fit(np.expand_dims(X_train, axis=1), y_train_ohe,
+        batch_size=32, epochs=100,
+        shuffle=True, verbose=1)
+
+print('time', time.time() - t)
 
 # In[89]:
 
